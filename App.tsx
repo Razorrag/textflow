@@ -2,12 +2,12 @@ import React, { useState, useCallback } from 'react';
 import { 
   Sparkles, Fingerprint, AlertCircle, ArrowRightLeft, 
   BookOpen, Wand2, Cpu, BarChart3, CheckCircle2, Download,
-  ShieldCheck
+  ShieldCheck, Activity, TrendingUp, AlertTriangle
 } from 'lucide-react';
 import { jsPDF } from "jspdf";
 import { TextArea } from './components/TextArea';
 import { Button } from './components/Button';
-import { rewriteText, analyzeText } from './services/geminiService';
+import { rewriteText, analyzeText } from './services/textAnalysisService';
 import { extractTextFromPdf } from './services/pdfService';
 import { RewriteMode, RewriteResponse, AnalysisResult } from './types';
 
@@ -28,6 +28,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const countWords = (str: string) => str.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const isTextTooShort = countWords(inputText) < 10;
 
   const handleRewrite = useCallback(async () => {
     if (!inputText.trim()) return;
@@ -295,7 +296,7 @@ const App: React.FC = () => {
 
         {/* TAB: ANALYZE */}
         {activeTab === 'analyze' && (
-          <div className="animate-in fade-in duration-500 max-w-4xl mx-auto">
+          <div className="animate-in fade-in duration-500 max-w-5xl mx-auto">
              <div className="mb-6 h-[300px]">
                 <TextArea 
                    label="Content Analysis"
@@ -321,8 +322,18 @@ const App: React.FC = () => {
                </Button>
              </div>
 
+             {isTextTooShort && analysisResult && (
+               <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+                 <AlertTriangle className="text-amber-500 mt-0.5" size={20} />
+                 <div>
+                   <h4 className="font-semibold text-amber-800">Text Too Short for Reliable Analysis</h4>
+                   <p className="text-sm text-amber-700">Texts under 10 words may produce unreliable results. Add more content for accurate AI pattern detection.</p>
+                 </div>
+               </div>
+             )}
+
              {analysisResult && (
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 fade-in">
+               <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 fade-in ${isTextTooShort ? 'opacity-50' : ''}`}>
                   
                   {/* Human Score Card */}
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
@@ -341,9 +352,9 @@ const App: React.FC = () => {
                      <p className="text-sm text-slate-600 font-medium">{analysisResult.verdict}</p>
                   </div>
 
-                  {/* AI Score Card */}
+                  {/* Machine Pattern Score Card */}
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
-                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">AI Pattern Score</h3>
+                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Machine Pattern Score</h3>
                      <div className="w-full flex-1 flex flex-col justify-center gap-4">
                         <div className="w-full">
                            <div className="flex justify-between text-xs font-semibold text-slate-500 mb-1">
@@ -363,23 +374,48 @@ const App: React.FC = () => {
                      </div>
                   </div>
 
-                   {/* Plagiarism/Uniqueness Card */}
-                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 text-center">Plagiarism Risk</h3>
+                  {/* Detailed Metrics Card */}
+                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 text-center">Detection Metrics</h3>
                      <div className="space-y-4 flex-1">
+                        {/* Perplexity */}
                         <div className="flex items-center justify-between">
-                           <span className="text-sm text-slate-600">Uniqueness (Vocab)</span>
-                           <span className="text-sm font-bold text-brand-600">{analysisResult.readabilityScore}%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                           <span className="text-sm text-slate-600">Duplication Risk</span>
-                           <span className={`text-sm font-bold ${analysisResult.plagiarismScore > 50 ? 'text-red-500' : 'text-green-500'}`}>
-                             {analysisResult.plagiarismScore > 50 ? 'High' : 'Low'}
+                           <div className="flex items-center gap-2">
+                             <Activity size={16} className="text-brand-500" />
+                             <span className="text-sm text-slate-600">Predictability</span>
+                           </div>
+                           <span className={`text-sm font-bold ${analysisResult.aiAnalysis.metrics.perplexity.interpretation === 'highly-predictable' ? 'text-red-500' : analysisResult.aiAnalysis.metrics.perplexity.interpretation === 'predictable' ? 'text-yellow-500' : 'text-green-500'}`}>
+                             {analysisResult.aiAnalysis.metrics.perplexity.interpretation.replace('-', ' ')}
                            </span>
                         </div>
-                        <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-500 mt-2">
-                           {analysisResult.details.map((d, i) => <div key={i} className="mb-1 last:mb-0">• {d}</div>)}
+                        {/* Burstiness */}
+                        <div className="flex items-center justify-between">
+                           <div className="flex items-center gap-2">
+                             <TrendingUp size={16} className="text-brand-500" />
+                             <span className="text-sm text-slate-600">Sentence Variation</span>
+                           </div>
+                           <span className={`text-sm font-bold ${analysisResult.aiAnalysis.metrics.burstiness.isLow ? 'text-red-500' : 'text-green-500'}`}>
+                             {analysisResult.aiAnalysis.metrics.burstiness.interpretation}
+                           </span>
                         </div>
+                        {/* Fingerprint Markers */}
+                        <div className="flex items-center justify-between">
+                           <div className="flex items-center gap-2">
+                             <Fingerprint size={16} className="text-brand-500" />
+                             <span className="text-sm text-slate-600">AI Markers</span>
+                           </div>
+                           <span className={`text-sm font-bold ${analysisResult.aiAnalysis.metrics.fingerprint.markerCount > 3 ? 'text-red-500' : analysisResult.aiAnalysis.metrics.fingerprint.markerCount > 0 ? 'text-yellow-500' : 'text-green-500'}`}>
+                             {analysisResult.aiAnalysis.metrics.fingerprint.markerCount} detected
+                           </span>
+                        </div>
+                        {analysisResult.aiAnalysis.metrics.fingerprint.markerCount > 0 && (
+                          <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-500">
+                            <div className="font-medium mb-1 text-slate-600">AI-typical words found:</div>
+                            {analysisResult.aiAnalysis.details.keyIndicators.slice(0, 5).map((indicator, i) => (
+                              <div key={i} className="mb-0.5">• {indicator}</div>
+                            ))}
+                          </div>
+                        )}
                      </div>
                   </div>
 

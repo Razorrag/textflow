@@ -99,6 +99,20 @@ export interface PlagiarismMatch {
 }
 
 // ====================
+// Rewrite/Response Types
+// ====================
+
+export interface RewriteResponse {
+  rewritten: string;
+  changes: string[];
+  stats: {
+    originalWordCount: number;
+    newWordCount: number;
+    [key: string]: number | string;
+  };
+}
+
+// ====================
 // Analysis Result Types
 // ====================
 

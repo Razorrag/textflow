@@ -21,7 +21,8 @@ import {
 
 // Humanization Engine
 import { 
-  HumanizationEngine 
+  HumanizationEngine,
+  TurnitinBypassEngine 
 } from '../engines/humanization';
 
 // Plagiarism Detection
@@ -34,11 +35,13 @@ export class TextAnalysisService {
   private aiEngine: ScoringEngine;
   private humanizationEngine: HumanizationEngine;
   private plagiarismDetector: PlagiarismDetector;
+  private turnitinEngine: TurnitinBypassEngine;
 
   constructor() {
     this.aiEngine = new ScoringEngine();
     this.humanizationEngine = new HumanizationEngine();
     this.plagiarismDetector = new PlagiarismDetector();
+    this.turnitinEngine = new TurnitinBypassEngine();
   }
 
   /**
@@ -104,6 +107,7 @@ export class TextAnalysisService {
 
   /**
    * Rewrite text (humanize + improve)
+   * Uses TurnitinBypassEngine for ACADEMIC and PLAG_REMOVER modes
    */
   rewrite(text: string, mode: RewriteMode = RewriteMode.HUMANIZE): {
     original: string;
@@ -119,27 +123,49 @@ export class TextAnalysisService {
     // Analyze original
     const originalAnalysis = this.aiEngine.analyze(text);
     
-    // Humanize
-    const humanized = this.humanizationEngine.humanize(text, {
-      increaseBurstiness: true,
-      varyVocabulary: true,
-      reduceTransitions: true,
-      injectHedging: mode !== RewriteMode.ACADEMIC,
-      addImperfections: mode === RewriteMode.HUMANIZE,
-      restructureSentences: true,
-      preserveMeaning: true
-    });
+    let rewrittenText: string;
+    let changes: string[];
+    
+    // Use TurnitinBypassEngine for ACADEMIC and PLAG_REMOVER modes
+    if (mode === RewriteMode.ACADEMIC || mode === RewriteMode.PLAG_REMOVER) {
+      const bypassResult = this.turnitinEngine.bypassTurnitin(text, {
+        vocabularyEnhancement: 'high',
+        paraphraseDepth: mode === RewriteMode.PLAG_REMOVER ? 'deep' : 'medium',
+        hedgingLevel: 0.5,
+        transitionDiversity: 'high',
+        sentenceVariation: 0.6,
+        formalityLevel: 0.8,
+        preserveAcademicTone: true
+      });
+      
+      rewrittenText = bypassResult.transformedText;
+      changes = bypassResult.transformationsApplied.map(t => t.description);
+    } else {
+      // Use standard humanization for other modes
+      const humanized = this.humanizationEngine.humanize(text, {
+        increaseBurstiness: true,
+        varyVocabulary: true,
+        reduceTransitions: true,
+        injectHedging: mode === RewriteMode.CREATIVE,
+        addImperfections: mode === RewriteMode.HUMANIZE,
+        restructureSentences: true,
+        preserveMeaning: true
+      });
+      
+      rewrittenText = humanized.transformedText;
+      changes = humanized.changes;
+    }
     
     // Analyze rewritten
-    const rewrittenAnalysis = this.aiEngine.analyze(humanized.transformedText);
+    const rewrittenAnalysis = this.aiEngine.analyze(rewrittenText);
     
     return {
       original: text,
-      rewritten: humanized.transformedText,
-      changes: humanized.changes.map(c => c.description),
+      rewritten: rewrittenText,
+      changes,
       stats: {
         originalWordCount: text.split(/\s+/).length,
-        newWordCount: humanized.transformedText.split(/\s+/).length,
+        newWordCount: rewrittenText.split(/\s+/).length,
         aiProbabilityBefore: originalAnalysis.aiProbability,
         aiProbabilityAfter: rewrittenAnalysis.aiProbability
       }
