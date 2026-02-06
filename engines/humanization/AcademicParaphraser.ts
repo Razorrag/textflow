@@ -32,6 +32,32 @@ const VOICE_TRANSFORMATIONS: ParaphrasePattern[] = [
       { pattern: 'the findings reveal that $3', preserveMeaning: true },
       { pattern: '$3 can be inferred from $1', preserveMeaning: true }
     ]
+  },
+  // NEW: Perspective Shift patterns for deeper restructuring
+  {
+    original: /\b(it\s+is\s+important\s+to\s+note\s+that|it\s+should\s+be\s+noted\s+that)\s+(.+)/gi,
+    transformations: [
+      { pattern: 'the evidence regarding $1 warrants particular attention', preserveMeaning: true },
+      { pattern: '$1, as revealed by the analysis, deserves careful consideration', preserveMeaning: true },
+      { pattern: 'notably, $1', preserveMeaning: true },
+      { pattern: 'of particular significance is $1', preserveMeaning: true }
+    ]
+  },
+  {
+    original: /\b(the\s+results\s+show|the\s+findings\s+indicate|the\s+data\s+demonstrates)\s+that\s+(.+)/gi,
+    transformations: [
+      { pattern: 'the evidence regarding $1, as revealed by results, necessitates closer examination', preserveMeaning: true },
+      { pattern: 'findings demonstrate $1, suggesting the need for further investigation', preserveMeaning: true },
+      { pattern: 'results indicate $1, though additional research may be required', preserveMeaning: true }
+    ]
+  },
+  {
+    original: /\b(studies\s+have\s+shown|research\s+has\s+demonstrated|evidence\s+suggests)\s+that\s+(.+)/gi,
+    transformations: [
+      { pattern: 'the collective evidence from multiple studies points to $1', preserveMeaning: true },
+      { pattern: 'a comprehensive analysis reveals $1, though individual results vary', preserveMeaning: true },
+      { pattern: 'across multiple investigations, $1 emerges as a consistent pattern', preserveMeaning: true }
+    ]
   }
 ];
 

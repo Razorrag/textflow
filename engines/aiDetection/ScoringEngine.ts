@@ -2,6 +2,7 @@
  * AI Detection Scoring Engine
  * 
  * Combines all detection metrics into a unified AI probability score.
+ * Now includes neural-based components for Turnitin-level detection.
  */
 
 import { PerplexityCalculator, PerplexityResult } from './PerplexityCalculator';
@@ -9,12 +10,18 @@ import { BurstinessAnalyzer, BurstinessResult } from './BurstinessAnalyzer';
 import { EntropyAnalyzer, EntropyResult } from './EntropyAnalyzer';
 import { StylometricAnalyzer, StylometricFeatures } from './StylometricAnalyzer';
 import { AIFingerprintDetector, AIFingerprintResult } from './AIFingerprintDetector';
+import { NeuralPerplexityCalculator, NeuralPerplexityResult } from './NeuralPerplexityCalculator';
+import { VectorSemanticAnalyzer, SemanticVectorResult } from './VectorSemanticAnalyzer';
+import { SyntacticDependencyAnalyzer, SyntacticPatternResult } from './SyntacticDependencyAnalyzer';
 
 export interface AIDetectionResult {
   aiProbability: number;
   humanProbability: number;
   scores: {
     perplexity: number;
+    neuralPerplexity: number;
+    semanticMonotony: number;
+    syntacticUniformity: number;
     burstiness: number;
     entropy: number;
     stylometry: number;
@@ -22,6 +29,9 @@ export interface AIDetectionResult {
   };
   metrics: {
     perplexity: PerplexityResult;
+    neuralPerplexity: NeuralPerplexityResult;
+    semanticAnalysis: SemanticVectorResult;
+    syntacticAnalysis: SyntacticPatternResult;
     burstiness: BurstinessResult;
     entropy: EntropyResult;
     stylometry: StylometricFeatures;
@@ -35,10 +45,14 @@ export interface AIDetectionResult {
     keyIndicators: string[];
     warnings: string[];
   };
+  detectionLevel: 'heuristic' | 'neural' | 'hybrid';
 }
 
 export interface ScoringWeights {
   perplexity: number;
+  neuralPerplexity: number;
+  semanticMonotony: number;
+  syntacticUniformity: number;
   burstiness: number;
   entropy: number;
   stylometry: number;
@@ -46,15 +60,21 @@ export interface ScoringWeights {
 }
 
 const DEFAULT_WEIGHTS: ScoringWeights = {
-  perplexity: 0.30,    // Strong indicator
-  burstiness: 0.25,   // Strong indicator
-  entropy: 0.15,       // Supporting indicator
-  stylometry: 0.15,    // Supporting indicator
-  fingerprint: 0.15    // Supporting indicator
+  perplexity: 0.10,        // Reduced weight for heuristic
+  neuralPerplexity: 0.25, // High weight for neural
+  semanticMonotony: 0.20, // High weight for semantic analysis
+  syntacticUniformity: 0.15, // Medium weight for syntax
+  burstiness: 0.10,       // Reduced weight
+  entropy: 0.05,          // Low weight
+  stylometry: 0.10,       // Medium weight
+  fingerprint: 0.05       // Low weight
 };
 
 export class ScoringEngine {
   private perplexity: PerplexityCalculator;
+  private neuralPerplexity: NeuralPerplexityCalculator;
+  private semanticAnalyzer: VectorSemanticAnalyzer;
+  private syntacticAnalyzer: SyntacticDependencyAnalyzer;
   private burstiness: BurstinessAnalyzer;
   private entropy: EntropyAnalyzer;
   private stylometry: StylometricAnalyzer;
@@ -63,6 +83,9 @@ export class ScoringEngine {
 
   constructor(weights: Partial<ScoringWeights> = {}) {
     this.perplexity = new PerplexityCalculator();
+    this.neuralPerplexity = new NeuralPerplexityCalculator();
+    this.semanticAnalyzer = new VectorSemanticAnalyzer();
+    this.syntacticAnalyzer = new SyntacticDependencyAnalyzer();
     this.burstiness = new BurstinessAnalyzer();
     this.entropy = new EntropyAnalyzer();
     this.stylometry = new StylometricAnalyzer();
@@ -72,15 +95,19 @@ export class ScoringEngine {
 
   /**
    * Analyze text and return comprehensive AI detection result
+   * Now includes neural-based analysis for Turnitin-level detection
    */
-  analyze(text: string): AIDetectionResult {
+  async analyze(text: string): Promise<AIDetectionResult> {
     // Skip very short texts
     if (text.split(/\s+/).length < 10) {
       return this.shortTextResult();
     }
 
-    // Calculate all metrics
+    // Calculate all metrics (including new neural ones)
     const perplexityMetrics = this.perplexity.calculate(text);
+    const neuralPerplexityMetrics = await this.neuralPerplexity.calculatePerplexity(text);
+    const semanticMetrics = await this.semanticAnalyzer.analyzeSemanticPatterns(text);
+    const syntacticMetrics = await this.syntacticAnalyzer.analyzeSyntacticPatterns(text);
     const burstinessMetrics = this.burstiness.analyze(text);
     const entropyMetrics = this.entropy.analyze(text);
     const stylometryMetrics = this.stylometry.extractFeatures(text);
@@ -89,6 +116,9 @@ export class ScoringEngine {
     // Calculate individual scores (0-100, higher = more likely AI)
     const scores = {
       perplexity: this.scorePerplexity(perplexityMetrics),
+      neuralPerplexity: this.scoreNeuralPerplexity(neuralPerplexityMetrics),
+      semanticMonotony: this.scoreSemanticMonotony(semanticMetrics),
+      syntacticUniformity: this.scoreSyntacticUniformity(syntacticMetrics),
       burstiness: this.scoreBurstiness(burstinessMetrics),
       entropy: this.scoreEntropy(entropyMetrics),
       stylometry: this.scoreStylometry(stylometryMetrics),
@@ -101,6 +131,9 @@ export class ScoringEngine {
     // Calculate confidence based on metrics quality
     const confidence = this.calculateConfidence(
       perplexityMetrics,
+      neuralPerplexityMetrics,
+      semanticMetrics,
+      syntacticMetrics,
       burstinessMetrics,
       entropyMetrics
     );
@@ -111,6 +144,9 @@ export class ScoringEngine {
     // Generate recommendations
     const recommendations = this.generateRecommendations(scores, {
       perplexity: perplexityMetrics,
+      neuralPerplexity: neuralPerplexityMetrics,
+      semanticAnalysis: semanticMetrics,
+      syntacticAnalysis: syntacticMetrics,
       burstiness: burstinessMetrics,
       entropy: entropyMetrics,
       stylometry: stylometryMetrics,
@@ -228,11 +264,53 @@ export class ScoringEngine {
   }
 
   /**
+   * Score neural perplexity (lower perplexity = more likely AI)
+   */
+  private scoreNeuralPerplexity(metrics: NeuralPerplexityResult): number {
+    if (metrics.isAI) {
+      return Math.round(metrics.confidence * 100);
+    }
+    return Math.round((1 - metrics.confidence) * 20);
+  }
+
+  /**
+   * Score semantic monotony (higher monotony = more likely AI)
+   */
+  private scoreSemanticMonotony(metrics: SemanticVectorResult): number {
+    if (metrics.isAI) {
+      return Math.round(metrics.confidence * 100);
+    }
+    return Math.round((1 - metrics.confidence) * 30);
+  }
+
+  /**
+   * Score syntactic uniformity (higher uniformity = more likely AI)
+   */
+  private scoreSyntacticUniformity(metrics: SyntacticPatternResult): number {
+    if (metrics.isAI) {
+      return Math.round(metrics.confidence * 100);
+    }
+    return Math.round((1 - metrics.confidence) * 25);
+  }
+
+  /**
    * Combine all scores using weights
    */
-  private combineScores(scores: { perplexity: number; burstiness: number; entropy: number; stylometry: number; fingerprint: number }): number {
+  private combineScores(scores: {
+    perplexity: number;
+    neuralPerplexity: number;
+    semanticMonotony: number;
+    syntacticUniformity: number;
+    burstiness: number;
+    entropy: number;
+    stylometry: number;
+    fingerprint: number;
+  }): number {
     return (
       scores.perplexity * this.weights.perplexity +
+      scores.neuralPerplexity * this.weights.neuralPerplexity +
+      scores.semanticMonotony * this.weights.semanticMonotony +
+      scores.syntacticUniformity * this.weights.syntacticUniformity +
       scores.burstiness * this.weights.burstiness +
       scores.entropy * this.weights.entropy +
       scores.stylometry * this.weights.stylometry +

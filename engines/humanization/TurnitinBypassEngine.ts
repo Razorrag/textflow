@@ -14,6 +14,8 @@ import { AcademicTransitionManager } from './TransitionReducer';
 import { AcademicTextRefiner } from './ImperfectionInjector';
 import { AcademicSentenceVariator } from './SentenceStructureVariator';
 import { AcademicParaphraser } from './AcademicParaphraser';
+import { BurstinessInjector } from './BurstinessInjector';
+import { CitationVariator } from './CitationVariator';
 
 // Turnitin-specific detection targets
 interface TurnitinDetectionMetrics {
@@ -65,6 +67,8 @@ export class TurnitinBypassEngine {
   private textRefiner: AcademicTextRefiner;
   private sentenceVariator: AcademicSentenceVariator;
   private paraphraser: AcademicParaphraser;
+  private burstinessInjector: BurstinessInjector;
+  private citationVariator: CitationVariator;
   
   constructor() {
     this.vocabularyHumanizer = new AcademicVocabularyHumanizer();
@@ -73,6 +77,8 @@ export class TurnitinBypassEngine {
     this.textRefiner = new AcademicTextRefiner();
     this.sentenceVariator = new AcademicSentenceVariator();
     this.paraphraser = new AcademicParaphraser();
+    this.burstinessInjector = new BurstinessInjector();
+    this.citationVariator = new CitationVariator();
   }
   
   /**
@@ -119,6 +125,17 @@ export class TurnitinBypassEngine {
       });
     }
     
+    // Step 3.5: Inject Burstiness (CRITICAL for AI bypass)
+    const burstyResult = this.burstinessInjector.inject(processedText, finalConfig.sentenceVariation);
+    if (burstyResult.text !== processedText) {
+      processedText = burstyResult.text;
+      transformations.push({
+        category: 'burstiness-injection',
+        count: burstyResult.result.changes.length,
+        description: 'Introduced human-like variance in sentence length and rhythm'
+      });
+    }
+    
     // Step 4: Academic hedging
     const hedgingResult = this.hedgingInjector.inject(processedText, finalConfig.hedgingLevel);
     if (hedgingResult.text !== processedText) {
@@ -141,9 +158,10 @@ export class TurnitinBypassEngine {
       });
     }
     
-    // Step 6: Deep paraphrasing for plagiarism evasion
-    let paraphraseIntensity: 'low' | 'medium' | 'high' = 'low';
-    if (finalConfig.paraphraseDepth === 'medium') paraphraseIntensity = 'medium';
+    // Step 6: Deep paraphrasing for plagiarism evasion (UPGRADED for maximum bypass)
+    let paraphraseIntensity: 'low' | 'medium' | 'high' = 'high'; // Default to HIGH for maximum bypass
+    if (finalConfig.paraphraseDepth === 'light') paraphraseIntensity = 'medium';
+    if (finalConfig.paraphraseDepth === 'medium') paraphraseIntensity = 'high';
     if (finalConfig.paraphraseDepth === 'deep') paraphraseIntensity = 'high';
     
     const paraphraseResult = this.paraphraser.paraphrase(processedText, paraphraseIntensity);
@@ -156,7 +174,18 @@ export class TurnitinBypassEngine {
       });
     }
     
-    // Step 7: Final refinement pass
+    // Step 7: Citation Pattern Variation (CRITICAL for AI bypass)
+    const citationResult = this.citationVariator.varyCitations(processedText);
+    if (citationResult.citationsVaried > 0) {
+      processedText = citationResult.text;
+      transformations.push({
+        category: 'citation-variation',
+        count: citationResult.citationsVaried,
+        description: 'Varied citation patterns to avoid AI-like consistency'
+      });
+    }
+    
+    // Step 8: Final refinement pass
     const finalRefinement = this.textRefiner.refine(processedText, 0.3);
     if (finalRefinement.text !== processedText) {
       processedText = finalRefinement.text;

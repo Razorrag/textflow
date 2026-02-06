@@ -288,7 +288,7 @@ function generateDetails(aiResult: AIDetectionResult, plagiarismResult: Plagiari
   const details: string[] = [];
 
   // AI Detection details
-  details.push(`AI Probability: ${aiResult.aiProbability}%`);
+  details.push(`Heuristic Score (Basic): ${aiResult.aiProbability}%`);
   details.push(`Confidence: ${aiResult.confidence}`);
   details.push(`Verdict: ${aiResult.verdict}`);
   

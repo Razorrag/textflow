@@ -48,7 +48,104 @@ const COMMON_TO_ACADEMIC: Record<string, AcademicSynonym[]> = {
     { word: 'advantageous', formality: 'formal', field: 'general', nuance: 'producing benefit' },
     { word: 'beneficial', formality: 'formal', field: 'general', nuance: 'favorable' },
     { word: 'favorable', formality: 'formal', field: 'general', nuance: 'expressing approval' },
-    { word: 'meritorious', formality: 'formal', field: 'academic', nuance: 'deserving praise' }
+    { word: 'optimal', formality: 'formal', field: 'mathematics', nuance: 'best possible' }
+  ],
+  // FIELD-SPECIFIC CYBERSECURITY/IDS VOCABULARY
+  'detect': [
+    { word: 'identify', formality: 'formal', field: 'general', nuance: 'recognize and classify' },
+    { word: 'recognize', formality: 'formal', field: 'general', nuance: 'perceive and identify' },
+    { word: 'ascertain', formality: 'formal', field: 'science', nuance: 'determine with certainty' },
+    { word: 'discern', formality: 'formal', field: 'science', nuance: 'perceive or recognize' },
+    { word: 'triangulate', formality: 'formal', field: 'science', nuance: 'determine using multiple sources' }
+  ],
+  'attack': [
+    { word: 'intrusion', formality: 'formal', field: 'science', nuance: 'unauthorized access attempt' },
+    { word: 'breach', formality: 'formal', field: 'science', nuance: 'security violation' },
+    { word: 'exploitation', formality: 'formal', field: 'science', nuance: 'taking advantage of vulnerability' },
+    { word: 'compromise', formality: 'formal', field: 'science', nuance: 'security breach' },
+    { word: 'adversarial action', formality: 'formal', field: 'science', nuance: 'hostile activity' }
+  ],
+  'system': [
+    { word: 'infrastructure', formality: 'formal', field: 'science', nuance: 'underlying framework' },
+    { word: 'architecture', formality: 'formal', field: 'science', nuance: 'structural design' },
+    { word: 'framework', formality: 'formal', field: 'science', nuance: 'supporting structure' },
+    { word: 'ecosystem', formality: 'formal', field: 'science', nuance: 'interconnected system' }
+  ],
+  'data': [
+    { word: 'information', formality: 'formal', field: 'general', nuance: 'processed facts' },
+    { word: 'dataset', formality: 'formal', field: 'science', nuance: 'structured collection' },
+    { word: 'observations', formality: 'formal', field: 'science', nuance: 'measured values' },
+    { word: 'metrics', formality: 'formal', field: 'science', nuance: 'quantitative measures' },
+    { word: 'attributes', formality: 'formal', field: 'science', nuance: 'characteristic properties' }
+  ],
+  'method': [
+    { word: 'methodology', formality: 'formal', field: 'academic', nuance: 'systematic approach' },
+    { word: 'approach', formality: 'formal', field: 'academic', nuance: 'way of dealing with' },
+    { word: 'framework', formality: 'formal', field: 'academic', nuance: 'conceptual structure' },
+    { word: 'paradigm', formality: 'formal', field: 'academic', nuance: 'model or pattern' },
+    { word: 'algorithm', formality: 'formal', field: 'mathematics', nuance: 'step-by-step procedure' }
+  ],
+  'analyze': [
+    { word: 'evaluate', formality: 'formal', field: 'general', nuance: 'assess value or significance' },
+    { word: 'assess', formality: 'formal', field: 'general', nuance: 'evaluate or estimate' },
+    { word: 'scrutinize', formality: 'formal', field: 'science', nuance: 'examine critically' },
+    { word: 'dissect', formality: 'formal', field: 'science', nuance: 'analyze in detail' },
+    { word: 'corroborate', formality: 'formal', field: 'science', nuance: 'confirm with evidence' }
+  ],
+  'network': [
+    { word: 'topology', formality: 'formal', field: 'science', nuance: 'network structure' },
+    { word: 'infrastructure', formality: 'formal', field: 'science', nuance: 'underlying framework' },
+    { word: 'architecture', formality: 'formal', field: 'science', nuance: 'structural design' },
+    { word: 'ecosystem', formality: 'formal', field: 'science', nuance: 'interconnected environment' }
+  ],
+  'security': [
+    { word: 'protection', formality: 'formal', field: 'general', nuance: 'safeguarding measure' },
+    { word: 'safeguarding', formality: 'formal', field: 'science', nuance: 'protective measures' },
+    { word: 'fortification', formality: 'formal', field: 'science', nuance: 'strengthening defenses' },
+    { word: 'resilience', formality: 'formal', field: 'science', nuance: 'ability to withstand attacks' }
+  ],
+  'algorithm': [
+    { word: 'methodology', formality: 'formal', field: 'academic', nuance: 'systematic approach' },
+    { word: 'framework', formality: 'formal', field: 'academic', nuance: 'conceptual structure' },
+    { word: 'paradigm', formality: 'formal', field: 'academic', nuance: 'model or pattern' },
+    { word: 'heuristic', formality: 'formal', field: 'science', nuance: 'problem-solving approach' },
+    { word: 'protocol', formality: 'formal', field: 'science', nuance: 'established procedure' }
+  ],
+  'idea': [
+    { word: 'concept', formality: 'formal', field: 'general', nuance: 'abstract idea' },
+    { word: 'notion', formality: 'formal', field: 'general', nuance: 'understanding' },
+    { word: 'theory', formality: 'formal', field: 'academic', nuance: 'systematic explanation' },
+    { word: 'proposition', formality: 'formal', field: 'academic', nuance: 'statement to be proved' }
+  ],
+  'part': [
+    { word: 'component', formality: 'formal', field: 'general', nuance: 'constituent element' },
+    { word: 'segment', formality: 'formal', field: 'general', nuance: 'distinct part' },
+    { word: 'portion', formality: 'formal', field: 'general', nuance: 'share of something' },
+    { word: 'section', formality: 'formal', field: 'academic', nuance: 'division of document' }
+  ],
+  'place': [
+    { word: 'location', formality: 'formal', field: 'general', nuance: 'position' },
+    { word: 'site', formality: 'formal', field: 'general', nuance: 'place of location' },
+    { word: 'area', formality: 'semi-formal', field: 'general', nuance: 'region' },
+    { word: 'setting', formality: 'formal', field: 'general', nuance: 'context or environment' }
+  ],
+  'group': [
+    { word: 'collective', formality: 'formal', field: 'general', nuance: 'group as single entity' },
+    { word: 'category', formality: 'formal', field: 'academic', nuance: 'classification' },
+    { word: 'set', formality: 'formal', field: 'mathematics', nuance: 'defined collection' },
+    { word: 'cohort', formality: 'formal', field: 'academic', nuance: 'group sharing characteristic' }
+  ],
+  'different': [
+    { word: 'distinct', formality: 'formal', field: 'general', nuance: 'clearly different' },
+    { word: 'diverse', formality: 'formal', field: 'general', nuance: 'showing variety' },
+    { word: 'varied', formality: 'formal', field: 'general', nuance: 'of different types' },
+    { word: 'dissimilar', formality: 'formal', field: 'academic', nuance: 'not alike' }
+  ],
+  'same': [
+    { word: 'identical', formality: 'formal', field: 'general', nuance: 'exactly the same' },
+    { word: 'equivalent', formality: 'formal', field: 'general', nuance: 'equal in value' },
+    { word: 'uniform', formality: 'formal', field: 'general', nuance: 'remaining the same' },
+    { word: 'comparable', formality: 'formal', field: 'academic', nuance: 'similar in nature' }
   ],
   'bad': [
     { word: 'detrimental', formality: 'formal', field: 'general', nuance: 'causing harm' },
@@ -135,46 +232,10 @@ const COMMON_TO_ACADEMIC: Record<string, AcademicSynonym[]> = {
     { word: 'difficulty', formality: 'formal', field: 'general', nuance: 'problem encountered' }
   ],
   'result': [
-    { word: 'outcome', formality: 'formal', field: 'general', nuance: 'way something ends' },
-    { word: 'consequence', formality: 'formal', field: 'general', nuance: 'result of action' },
-    { word: 'finding', formality: 'formal', field: 'academic', nuance: 'discovered fact' },
-    { word: 'implication', formality: 'formal', field: 'academic', nuance: 'suggested conclusion' }
-  ],
-  'idea': [
-    { word: 'concept', formality: 'formal', field: 'general', nuance: 'abstract idea' },
-    { word: 'notion', formality: 'formal', field: 'general', nuance: 'understanding' },
-    { word: 'theory', formality: 'formal', field: 'academic', nuance: 'systematic explanation' },
-    { word: 'proposition', formality: 'formal', field: 'academic', nuance: 'statement to be proved' }
-  ],
-  'part': [
-    { word: 'component', formality: 'formal', field: 'general', nuance: 'constituent element' },
-    { word: 'segment', formality: 'formal', field: 'general', nuance: 'distinct part' },
-    { word: 'portion', formality: 'formal', field: 'general', nuance: 'share of something' },
-    { word: 'section', formality: 'formal', field: 'academic', nuance: 'division of document' }
-  ],
-  'place': [
-    { word: 'location', formality: 'formal', field: 'general', nuance: 'position' },
-    { word: 'site', formality: 'formal', field: 'general', nuance: 'place of location' },
-    { word: 'area', formality: 'semi-formal', field: 'general', nuance: 'region' },
-    { word: 'setting', formality: 'formal', field: 'general', nuance: 'context or environment' }
-  ],
-  'group': [
-    { word: 'collective', formality: 'formal', field: 'general', nuance: 'group as single entity' },
-    { word: 'category', formality: 'formal', field: 'academic', nuance: 'classification' },
-    { word: 'set', formality: 'formal', field: 'mathematics', nuance: 'defined collection' },
-    { word: 'cohort', formality: 'formal', field: 'academic', nuance: 'group sharing characteristic' }
-  ],
-  'different': [
-    { word: 'distinct', formality: 'formal', field: 'general', nuance: 'clearly different' },
-    { word: 'diverse', formality: 'formal', field: 'general', nuance: 'showing variety' },
-    { word: 'varied', formality: 'formal', field: 'general', nuance: 'of different types' },
-    { word: 'dissimilar', formality: 'formal', field: 'academic', nuance: 'not alike' }
-  ],
-  'same': [
-    { word: 'identical', formality: 'formal', field: 'general', nuance: 'exactly the same' },
-    { word: 'equivalent', formality: 'formal', field: 'general', nuance: 'equal in value' },
-    { word: 'uniform', formality: 'formal', field: 'general', nuance: 'remaining the same' },
-    { word: 'comparable', formality: 'formal', field: 'academic', nuance: 'similar in nature' }
+    { word: 'outcome', formality: 'formal', field: 'general', nuance: 'final result' },
+    { word: 'consequence', formality: 'formal', field: 'academic', nuance: 'result of action' },
+    { word: 'implication', formality: 'formal', field: 'academic', nuance: 'suggested meaning' },
+    { word: 'ramification', formality: 'formal', field: 'academic', nuance: 'complex consequence' }
   ]
 };
 
