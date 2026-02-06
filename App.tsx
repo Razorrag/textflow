@@ -7,6 +7,7 @@ import {
 import { jsPDF } from "jspdf";
 import { TextArea } from './components/TextArea';
 import { Button } from './components/Button';
+import { textProcessorWorker } from './workers/workerManager';
 import { rewriteText, analyzeText } from './services/textAnalysisService';
 import { extractTextFromPdf } from './services/pdfService';
 import { RewriteMode, RewriteResponse, AnalysisResult } from './types';
@@ -36,7 +37,10 @@ const App: React.FC = () => {
     setError(null);
     setRewriteResult(null);
     try {
-      const data = await rewriteText(inputText, activeMode);
+      // Use Web Worker if available, fallback to direct service call
+      const data = textProcessorWorker.isAvailable 
+        ? await textProcessorWorker.rewriteText(inputText, activeMode)
+        : await rewriteText(inputText, activeMode);
       setRewriteResult(data);
     } catch (err: any) {
       setError(err.message || "Processing failed.");
@@ -51,7 +55,10 @@ const App: React.FC = () => {
     setError(null);
     setAnalysisResult(null);
     try {
-      const data = await analyzeText(inputText);
+      // Use Web Worker if available, fallback to direct service call
+      const data = textProcessorWorker.isAvailable 
+        ? await textProcessorWorker.analyzeText(inputText)
+        : await analyzeText(inputText);
       setAnalysisResult(data);
     } catch (err: any) {
       setError(err.message || "Analysis failed.");
