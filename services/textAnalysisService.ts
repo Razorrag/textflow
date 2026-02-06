@@ -9,7 +9,8 @@ import {
   HumanizationResult, 
   HumanizationConfig,
   AnalysisResult,
-  RewriteMode
+  RewriteMode,
+  RewriteResponse
 } from '../types';
 
 // AI Detection Engine
@@ -109,17 +110,7 @@ export class TextAnalysisService {
    * Rewrite text (humanize + improve)
    * Uses TurnitinBypassEngine for ACADEMIC and PLAG_REMOVER modes
    */
-  rewrite(text: string, mode: RewriteMode = RewriteMode.HUMANIZE): {
-    original: string;
-    rewritten: string;
-    changes: string[];
-    stats: {
-      originalWordCount: number;
-      newWordCount: number;
-      aiProbabilityBefore: number;
-      aiProbabilityAfter: number;
-    };
-  } {
+  rewrite(text: string, mode: RewriteMode = RewriteMode.HUMANIZE): RewriteResponse {
     // Analyze original
     const originalAnalysis = this.aiEngine.analyze(text);
     
@@ -160,7 +151,6 @@ export class TextAnalysisService {
     const rewrittenAnalysis = this.aiEngine.analyze(rewrittenText);
     
     return {
-      original: text,
       rewritten: rewrittenText,
       changes,
       stats: {

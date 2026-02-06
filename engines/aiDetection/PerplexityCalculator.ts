@@ -4,6 +4,11 @@
  * Calculates perplexity scores based on n-gram language models.
  * Perplexity measures how "predictable" text is - AI-generated text
  * tends to have lower perplexity (more predictable).
+ * 
+ * NOTE: This is a simplified implementation for demonstration purposes.
+ * Real perplexity calculation requires large language models trained
+ * on billions of tokens. This implementation uses a small corpus
+ * and should be considered educational rather than production-ready.
  */
 
 export interface PerplexityResult {
@@ -13,30 +18,73 @@ export interface PerplexityResult {
   interpretation: 'highly-predictable' | 'predictable' | 'natural' | 'highly-variable';
 }
 
-// Training corpus for building n-gram models
+// Expanded training corpus with more diverse text patterns
+// In production, this should be replaced with a large, diverse corpus
 const TRAINING_CORPUS = [
-  // Sample human-written text patterns for training
-  // In production, load from external corpus file
+  // Academic writing patterns
   'the quick brown fox jumps over the lazy dog',
   'research shows that many factors contribute to outcomes',
   'studies have demonstrated various approaches to solving problems',
-  'in conclusion the evidence suggests several important findings',
+  'in conclusion evidence suggests several important findings',
   'furthermore additional research reveals new insights about',
   'these findings indicate that future work should explore',
   'however there are limitations that should be considered',
-  'moreover the results contribute to our understanding of',
+  'moreover results contribute to our understanding of',
   'nevertheless this study provides valuable evidence for',
-  'the data analysis reveals significant patterns in the results',
+  'the data analysis reveals significant patterns in results',
   'on the other hand some researchers argue that',
   'it is important to note that these results show',
   'subsequent experiments confirmed these initial observations',
-  'despite these challenges the methodology proved effective',
-  'the frameworksoretical suggest that relationships exist between',
+  'despite these challenges methodology proved effective',
+  'the theoretical framework suggests that relationships exist between',
   'empirical evidence supports the hypothesis that',
   'statistical analysis demonstrates correlation between variables',
   'qualitative data reveals nuanced insights about',
   'quantitative measurements indicate substantial variation in',
   'preliminary findings suggest potential applications for',
+  
+  // Conversational and informal patterns
+  'hey what\'s up I was wondering if you could help',
+  'thanks so much for your time and consideration',
+  'I think this is a really interesting point',
+  'to be honest I\'m not completely sure about this',
+  'let me know what you think when you get a chance',
+  'sorry for the delay in getting back to you',
+  'that makes sense I hadn\'t thought of it that way',
+  'great idea let\'s definitely move forward with that',
+  'I appreciate you bringing this to my attention',
+  'no worries at all these things happen',
+  
+  // Creative and narrative patterns
+  'the old house stood silently against the stormy sky',
+  'she walked through the garden remembering childhood memories',
+  'music filled the room with warmth and nostalgia',
+  'the city lights reflected in the puddles below',
+  'time seemed to slow down as the moment approached',
+  'his words hung in the air like fragile glass',
+  'the story unfolded like a carefully crafted tapestry',
+  'shadows danced across the walls in the moonlight',
+  'the scent of rain brought back forgotten feelings',
+  'every corner held secrets waiting to be discovered',
+  
+  // Technical and professional patterns
+  'the system architecture supports multiple concurrent users',
+  'implementation requires careful consideration of edge cases',
+  'performance metrics indicate significant improvement over baseline',
+  'the API documentation provides comprehensive usage examples',
+  'debugging revealed several memory allocation issues',
+  'the deployment process includes automated testing stages',
+  'security protocols must be strictly enforced at all levels',
+  'the database schema normalization reduces redundancy',
+  'code review identified potential optimization opportunities',
+  'the integration test suite covers all major use cases',
+  
+  // Mixed complexity sentences
+  'although the initial results were promising further investigation revealed unexpected complications',
+  'despite extensive preparation the project encountered numerous challenges that required immediate attention',
+  'the comprehensive analysis demonstrated clear correlations between variables previously thought to be independent',
+  'while the theoretical framework provides a solid foundation practical implementation requires additional considerations',
+  'given the complexity of the issue a multidisciplinary approach offers the most promising path forward'
 ];
 
 // N-gram frequency maps
